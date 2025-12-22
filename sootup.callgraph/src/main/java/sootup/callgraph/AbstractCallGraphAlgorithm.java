@@ -242,6 +242,10 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
       @NonNull InvokableStmt invokeStmt,
       @NonNull MutableCallGraph cg,
       @NonNull Deque<MethodSignature> workList) {
+    if (!includeCallToTarget(source, target)) {
+      return;
+    }
+
     if (!cg.containsMethod(source)) {
       cg.addMethod(source);
       workList.push(source);
@@ -293,13 +297,14 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
         .filter(Stmt::isInvokableStmt)
         .map(Stmt::asInvokableStmt)
         .forEach(
-            stmt -> {
-              Stream<MethodSignature> stream = includeCall(sourceMethod, stmt)
-                  ? resolveCall(sourceMethod, stmt)
-                  : Stream.empty();
-              stream.filter(targetMethod -> includeCallToTarget(sourceMethod.getSignature(), targetMethod))
-                  .forEach(targetMethod -> addCallToCG(sourceMethod.getSignature(), targetMethod, stmt, cg, workList));
-            });
+            stmt ->
+                (includeCall(sourceMethod, stmt)
+                        ? resolveCall(sourceMethod, stmt)
+                        : Stream.<MethodSignature>empty())
+                    .forEach(
+                        targetMethod ->
+                            addCallToCG(
+                                sourceMethod.getSignature(), targetMethod, stmt, cg, workList)));
   }
 
   /**
