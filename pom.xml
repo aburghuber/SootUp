@@ -66,7 +66,7 @@
         <module>sootup.interceptors</module>
         <module>sootup.java.bytecode.frontend</module>
         <module>sootup.callgraph</module>
-        <module>sootup.spark</module>
+       <!-- <module>sootup.spark</module>-->
         <module>sootup.qilin</module>
         <module>sootup.analysis.interprocedural</module>
         <module>sootup.analysis.intraprocedural</module>
@@ -121,6 +121,23 @@
                 <module>sootup.tests</module>
                 <module>sootup.report</module>
             </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>deployment</id>
