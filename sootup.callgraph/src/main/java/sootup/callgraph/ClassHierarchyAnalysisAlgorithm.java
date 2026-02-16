@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
@@ -57,13 +58,19 @@ public class ClassHierarchyAnalysisAlgorithm extends AbstractCallGraphAlgorithm 
   @NonNull
   @Override
   public CallGraph initialize() {
-    return constructCompleteCallGraph(Collections.singletonList(findMainMethod()));
+    return constructCompleteCallGraph(Collections.singletonList(findMainMethod()), null);
   }
 
   @NonNull
   @Override
   public CallGraph initialize(@NonNull List<MethodSignature> entryPoints) {
-    return constructCompleteCallGraph(entryPoints);
+    return constructCompleteCallGraph(entryPoints, null);
+  }
+
+  @Override
+  public @NonNull CallGraph initialize(
+      @NonNull List<MethodSignature> entryPoints, @Nullable String basePackageName) {
+    return constructCompleteCallGraph(entryPoints, basePackageName);
   }
 
   /**
@@ -86,6 +93,10 @@ public class ClassHierarchyAnalysisAlgorithm extends AbstractCallGraphAlgorithm 
     AbstractInvokeExpr invokeExpr = optInvokeExpr.get();
     MethodSignature targetMethodSignature = invokeExpr.getMethodSignature();
     if ((invokeExpr instanceof JDynamicInvokeExpr)) {
+      return Stream.empty();
+    }
+
+    if (!includeCallToTarget(method.getSignature(), targetMethodSignature)) {
       return Stream.empty();
     }
 
