@@ -158,7 +158,8 @@ public class DexClassSource extends JavaSootClassSource {
   @Override
   protected Iterable<AnnotationUsage> resolveAnnotations() {
     if (classInformation != null) {
-      return DexUtil.createAnnotationUsage(classInformation.classDefinition.getAnnotations(), getView());
+      return DexUtil.createAnnotationUsage(
+          classInformation.classDefinition.getAnnotations(), getView());
     }
     return Collections.emptyList();
   }

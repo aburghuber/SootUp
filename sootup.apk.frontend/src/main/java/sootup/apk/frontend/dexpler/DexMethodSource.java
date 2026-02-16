@@ -94,15 +94,21 @@ public class DexMethodSource implements BodySource {
   public JavaSootMethod makeSootMethod() {
     JavaSootMethod sootMethod;
     EnumSet<MethodModifier> methodModifiers = Modifiers.getMethodModifiers(method.getAccessFlags());
-    Iterable<AnnotationUsage> annotationUsages = DexUtil.createAnnotationUsage(method.getAnnotations(), view);
+    Iterable<AnnotationUsage> annotationUsages =
+        DexUtil.createAnnotationUsage(method.getAnnotations(), view);
     List<Set<AnnotationUsage>> parameterAnnotations = Collections.emptyList();
-    Iterable<ClassType> thrownExceptions = DexUtil.extractThrownExceptions(method.getAnnotations(), view);
+    Iterable<ClassType> thrownExceptions =
+        DexUtil.extractThrownExceptions(method.getAnnotations(), view);
 
     if (method instanceof DexBackedMethod) {
-      parameterAnnotations = ((DexBackedMethod) method).getParameterAnnotations()
-          .stream()
-          .map(annotations -> (Set<AnnotationUsage>) Sets.newHashSet(DexUtil.createAnnotationUsage(annotations, view)))
-          .toList();
+      parameterAnnotations =
+          ((DexBackedMethod) method)
+              .getParameterAnnotations().stream()
+                  .map(
+                      annotations ->
+                          (Set<AnnotationUsage>)
+                              Sets.newHashSet(DexUtil.createAnnotationUsage(annotations, view)))
+                  .toList();
     }
 
     try {
