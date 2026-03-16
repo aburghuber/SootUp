@@ -22,6 +22,11 @@ package sootup.callgraph;
  * #L%
  */
 
+import static sootup.core.jimple.basic.StmtPositionInfo.getNoStmtPositionInfo;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -45,12 +50,6 @@ import sootup.core.typehierarchy.TypeHierarchy;
 import sootup.core.types.ClassType;
 import sootup.core.types.VoidType;
 import sootup.core.views.View;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static sootup.core.jimple.basic.StmtPositionInfo.getNoStmtPositionInfo;
 
 /**
  * The AbstractCallGraphAlgorithm class is the super class of all call graph algorithm. It provides
@@ -92,10 +91,10 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
    * @return the complete constructed call graph starting from the entry methods.
    */
   @NonNull
-  final CallGraph constructCompleteCallGraph(List<MethodSignature> entryPoints, @Nullable String applicationBasePackageName) {
-    applicationBasePackageName = applicationBasePackageName != null
-            ? applicationBasePackageName.toLowerCase()
-            : null;
+  final CallGraph constructCompleteCallGraph(
+      List<MethodSignature> entryPoints, @Nullable String applicationBasePackageName) {
+    applicationBasePackageName =
+        applicationBasePackageName != null ? applicationBasePackageName.toLowerCase() : null;
 
     Deque<MethodSignature> workList = new ArrayDeque<>(entryPoints);
     Set<MethodSignature> processed = new HashSet<>();
@@ -156,8 +155,11 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
    * @param processed the list of processed method to only process the method once.
    * @param cg the call graph object that is filled with the found methods and call edges.
    */
-  final void processWorkList(Deque<MethodSignature> workList, Set<MethodSignature> processed,
-                             MutableCallGraph cg, @Nullable String applicationBasePackageName) {
+  final void processWorkList(
+      Deque<MethodSignature> workList,
+      Set<MethodSignature> processed,
+      MutableCallGraph cg,
+      @Nullable String applicationBasePackageName) {
     while (!workList.isEmpty()) {
       MethodSignature currentMethodSignature = workList.pop();
       // skip if already processed
@@ -170,7 +172,8 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
           view.getClass(currentMethodSignature.getDeclClassType()).orElse(null);
       if (currentClass == null
           || currentClass.isLibraryClass()
-          || (applicationBasePackageName != null && !isClassPartOfApplication(currentClass, applicationBasePackageName))) {
+          || (applicationBasePackageName != null
+              && !isClassPartOfApplication(currentClass, applicationBasePackageName))) {
         continue;
       }
 
@@ -204,13 +207,15 @@ public abstract class AbstractCallGraphAlgorithm implements CallGraphAlgorithm {
       postProcessingMethod(currentMethodSignature, workList, cg);
     }
   }
+
   private boolean isClassPartOfApplication(SootClass sootClass, String applicationBasePackageName) {
-      return sootClass.getClassSource()
-              .getClassType()
-              .getPackageName()
-              .toString()
-              .toLowerCase()
-              .contains(applicationBasePackageName);
+    return sootClass
+        .getClassSource()
+        .getClassType()
+        .getPackageName()
+        .toString()
+        .toLowerCase()
+        .contains(applicationBasePackageName);
   }
 
   /**
